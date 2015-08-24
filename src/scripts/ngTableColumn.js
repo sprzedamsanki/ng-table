@@ -19,6 +19,7 @@
         var defaults = {
             'class': function(){ return ''; },
             filter: function(){ return false; },
+            summary: function() { return false; },
             filterData: angular.noop,
             headerTemplateURL: function(){ return false; },
             headerTitle: function(){ return ''; },

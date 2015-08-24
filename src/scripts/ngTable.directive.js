@@ -78,6 +78,7 @@
                             filter: parsedAttribute('filter'),
                             headerTemplateURL: parsedAttribute('header'),
                             filterData: parsedAttribute('filter-data'),
+                            summary: parsedAttribute('summary'),
                             show: (el.attr("ng-if") ? function (scope) {
                                 return $parse(el.attr("ng-if"))(scope);
                             } : undefined)

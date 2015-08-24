@@ -404,6 +404,7 @@
         var defaults = {
             'class': function(){ return ''; },
             filter: function(){ return false; },
+            summary: function() { return false; },
             filterData: angular.noop,
             headerTemplateURL: function(){ return false; },
             headerTitle: function(){ return ''; },
@@ -1162,6 +1163,7 @@
                 if (!$element.hasClass('ng-table')) {
                     $scope.templates = {
                         header: ($attrs.templateHeader ? $attrs.templateHeader : 'ng-table/header.html'),
+                        footer: ($attrs.templateFooter ? $attrs.templateFooter : 'ng-table/footer.html'),
                         pagination: ($attrs.templatePagination ? $attrs.templatePagination : 'ng-table/pager.html')
                     };
                     $element.addClass('ng-table');
@@ -1178,6 +1180,17 @@
                         headerTemplate = angular.element(document.createElement('thead')).attr('ng-include', 'templates.header');
                         $element.prepend(headerTemplate);
                     }
+                    var footerTemplate = null;
+                    var tfootFound = false;
+                    angular.forEach($element.children(), function(e){
+                       if (e.tagName === 'TFOOT') {
+                          theadFound = true;
+                       }
+                    });
+                    if (!tfootFound) {
+                       footerTemplate = angular.element(document.createElement('tfoot')).attr('ng-include', 'templates.footer');
+                       $element.append(footerTemplate);
+                    }
                     var paginationTemplate = angular.element(document.createElement('div')).attr({
                         'ng-table-pagination': 'params',
                         'template-url': 'templates.pagination'
@@ -1185,6 +1198,9 @@
                     $element.after(paginationTemplate);
                     if (headerTemplate) {
                         $compile(headerTemplate)($scope);
+                    }
+                    if (footerTemplate) {
+                       $compile(footerTemplate)($scope);
                     }
                     $compile(paginationTemplate)($scope);
                 }
@@ -1375,6 +1391,7 @@
                             filter: parsedAttribute('filter'),
                             headerTemplateURL: parsedAttribute('header'),
                             filterData: parsedAttribute('filter-data'),
+                            summary: parsedAttribute('summary'),
                             show: (el.attr("ng-if") ? function (scope) {
                                 return $parse(el.attr("ng-if"))(scope);
                             } : undefined)
@@ -1735,6 +1752,7 @@ angular.module('ngTable').run(['$templateCache', function ($templateCache) {
 	$templateCache.put('ng-table/filters/select-multiple.html', '<select ng-options="data.id as data.title for data in $column.data" ng-disabled="$filterRow.disabled" multiple ng-multiple="true" ng-model="params.filter()[name]" class="filter filter-select-multiple form-control" name="{{name}}"> </select> ');
 	$templateCache.put('ng-table/filters/select.html', '<select ng-options="data.id as data.title for data in $selectData" ng-table-select-filter-ds="$column" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" class="filter filter-select form-control" name="{{name}}"> <option style="display:none" value=""></option> </select> ');
 	$templateCache.put('ng-table/filters/text.html', '<input type="text" name="{{name}}" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" class="input-filter form-control" placeholder="{{getFilterPlaceholderValue(filter, name)}}"/> ');
+	$templateCache.put('ng-table/footer.html', '<tr> <td> TESTFOOTER </td> <td> TEST FOOTER </td> </tr> ');
 	$templateCache.put('ng-table/header.html', '<ng-table-sorter-row></ng-table-sorter-row> <ng-table-filter-row></ng-table-filter-row> ');
 	$templateCache.put('ng-table/pager.html', '<div class="ng-cloak ng-table-pager" ng-if="params.data.length"> <div ng-if="params.settings().counts.length" class="ng-table-counts btn-group pull-right"> <button ng-repeat="count in params.settings().counts" type="button" ng-class="{\'active\':params.count()==count}" ng-click="params.count(count)" class="btn btn-default"> <span ng-bind="count"></span> </button> </div> <ul ng-if="pages.length" class="pagination ng-table-pagination"> <li ng-class="{\'disabled\': !page.active && !page.current, \'active\': page.current}" ng-repeat="page in pages" ng-switch="page.type"> <a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo;</a> <a ng-switch-when="first" ng-click="params.page(page.number)" href=""><span ng-bind="page.number"></span></a> <a ng-switch-when="page" ng-click="params.page(page.number)" href=""><span ng-bind="page.number"></span></a> <a ng-switch-when="more" ng-click="params.page(page.number)" href="">&#8230;</a> <a ng-switch-when="last" ng-click="params.page(page.number)" href=""><span ng-bind="page.number"></span></a> <a ng-switch-when="next" ng-click="params.page(page.number)" href="">&raquo;</a> </li> </ul> </div> ');
 	$templateCache.put('ng-table/sorterRow.html', '<tr> <th title="{{$column.headerTitle(this)}}" ng-repeat="$column in $columns" ng-class="{ \'sortable\': $column.sortable(this), \'sort-asc\': params.sorting()[$column.sortable(this)]==\'asc\', \'sort-desc\': params.sorting()[$column.sortable(this)]==\'desc\' }" ng-click="sortBy($column, $event)" ng-if="$column.show(this)" ng-init="template=$column.headerTemplateURL(this)" class="header {{$column.class(this)}}"> <div ng-if="!template" class="ng-table-header" ng-class="{\'sort-indicator\': params.settings().sortingIndicator==\'div\'}"> <span ng-bind="$column.title(this)" ng-class="{\'sort-indicator\': params.settings().sortingIndicator==\'span\'}"></span> </div> <div ng-if="template" ng-include="template"></div> </th> </tr> ');
