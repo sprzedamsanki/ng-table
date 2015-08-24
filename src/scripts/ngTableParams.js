@@ -136,6 +136,34 @@
 
             /**
              * @ngdoc method
+             * @name NgTableParams#summary
+             * @description If parameter summary not set return current summary else set current summary
+             *
+             * @param {string} summary
+             * @returns {Object|Number} Current summary or `this`
+             */
+            this.summary = function(summary) {
+               return angular.isDefined(summary) ? this.parameters({
+                  'summary': summary
+               }) : params.summary;
+            }
+
+            /**
+             * @ngdoc method
+             * @name NgTableParams#summaryVaules
+             * @description If parameter summaryVaules not set return current summary else set current summaryVaules
+             *
+             * @param {string} summaryVaules
+             * @returns {Object|Number} Current summaryVaules or `this`
+             */
+            this.summaryValues = function(summaryValues) {
+               return angular.isDefined(summaryValues) ? this.parameters({
+                  'summaryValues': summaryValues
+               }) : params.summaryValues;
+            }
+
+            /**
+             * @ngdoc method
              * @name NgTableParams#total
              * @description If parameter total not set return current quantity else set quantity
              *
@@ -177,6 +205,7 @@
              * @returns {Object} Current filter or `this`
              */
             this.filter = function(filter) {
+               
                 if (angular.isDefined(filter) && angular.isObject(filter)) {
                     return this.parameters({
                         'filter': filter,
@@ -615,5 +644,3 @@
         return NgTableParams;
     }]);
 })();
-
-
