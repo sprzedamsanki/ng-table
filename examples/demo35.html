@@ -55,11 +55,44 @@
                         {name: "Nephi", age: 29},
                         {name: "Enos", age: 34}];
 
+            function filterSortAndSlice(collection, $defer, params) {
+               collection =
+                    params.filter() ?
+                    $filter('filter')(collection, params.filter()) :
+                    collection;
+
+               collection = params.sorting() ?
+                       $filter('orderBy')(collection, params.orderBy()) :
+                       collection;
+
+               params.total(collection.length);
+               debugger;
+               var summaryFuncs = params.settings().summaries;
+               var summaryValues = {};
+               angular.forEach(summaryFuncs, function(summaryFunc) {
+                   var column = summaryFunc();
+                   if (column) {
+                       summaryValues[column] = 0;
+                       angular.forEach(collection, function(row){
+                           summaryValues[column] += row[column];
+                       });
+                   }
+               });
+
+               params.summaryValues(summaryValues);
+
+               $defer.resolve(
+                   collection.slice((params.page() - 1) * params.count(),
+                   params.page() * params.count()));
+           }
+
             $scope.tableParams = new NgTableParams({
                 page: 1,            // show first page
                 count: 10           // count per page
             }, {
-                data: data
+                getData: function ($defer, params) {
+                   filterSortAndSlice(data, $defer, params);
+                }
             });
         })
         </script>
